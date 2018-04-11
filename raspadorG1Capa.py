@@ -4,92 +4,95 @@ from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
 import time
-import requests
 from fake_useragent import UserAgent
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import nltk
 import re
-
+import requests
 
 #________Requests pagina inicial____________
 url = 'http://g1.globo.com/minas-gerais/'
 headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'}
+
 response = requests.get(url, headers=headers)
 
 #print(response.content)
 
-
-#________Definindo Classes e Funçoes___________
-
-
-class Reportagem(object):
-    v1=  'G1 - Minas Gerais'
-    v2 = 3
-    
-    def set_v3(self, titulo):
-        if len(titulo)>5:
-            self.v3 = titulo
-        else:
-            print ('Erro: Titulo tem menos que cinco caracteres.')
-            
-    def set_v4(self, subtitulo):
-        su
-
-
-titulo = 'Eu sou Deus'
-titulo    
-teste = Reportagem()
-teste.set_v3(titulo)
-
-teste.v3
 
 #________Mineirando dados pagina inicial____________
 
 soup = BeautifulSoup(response.content, 'html.parser')
 dadosBrutos = soup.find_all("div", class_="feed-post-body")
 
+titulo = []
+subtitulo = []
+tema = []
+urlReportagem = []
+dataHoraReportagem = []
+autor = []
+texto = []
+imagens = []
+
+textCoder = []
+soupReportagem = []
+
+
 for i in dadosBrutos:
     print('\n \n')
-    titulo = (i.find_all("p", class_="feed-post-body-title gui-color-primary gui-color-hover"))[0].text
-    subtitulo = i.find_all("p", class_="feed-post-body-resumo")[0].text
+    titulo.append((i.find_all("p", class_="feed-post-body-title gui-color-primary gui-color-hover"))[0].text)
+    
     try:
-        tema = (i.find_all("span", class_="feed-post-header-chapeu"))[0].text
+        subtitulo.append(i.find_all("p", class_="feed-post-body-resumo")[0].text)
     except:
-        tema = ""
-    urlReportagem = i.a.attrs['href']
+        subtitulo.append('')
+    try:
+        tema.append((i.find_all("span", class_="feed-post-header-chapeu"))[0].text)
+    except:
+        tema.append('')
+    urlReportagem.append (i.a.attrs['href'])
+
+cont = 0
+for i in urlReportagem:
+    print(cont)
+    responseReportagem = requests.get(i, headers=headers)
+    soupReportagem.append (BeautifulSoup(responseReportagem.content, 'html.parser'))
+
+    # DATA | HORA -> [1]data DD/MM/AAAA [2]hora 10h03
+    try:
+        dataHoraReportagem.append(((soupReportagem[cont].find("time", itemprop="datePublished" )).text.split(' ')))
+    except:
+        dataHoraReportagem.append('')
+        print('Erro: Data não encontrada')
+        
+    #autor
+    try:
+        autor.append ((((soupReportagem[cont].find("p", class_="content-publication-data__from")).text).split(' Por '))[1].rstrip(' '))
+    except:
+        autor.append('')
+        print('Erro: Data não encontrada')
+        
+    textCoder = soupReportagem[cont].find_all("p", class_="content-text__container")
+    text = ''
     
-    print(titulo)
-    print(tema)
+    for i in textCoder:
+        text = text + i.text
+    
+    texto.append(text)
+
+    img = soupReportagem[cont].find_all('img', class_='image content-media__image')
+    
+    if img:
+        imagens.append('Sim')
+    else:
+        imagens.append('Não')
+        
+    cont = cont + 1
+    
     
 
 
-
-dadosBrutos[0].find_all ("span", class_="feed-post-header-chapeu")[0].text
-dadosBrutos[3].(i.find_all ("span", class_="feed-post-header-chapeu"))[0].text
-
-responseReportagem = requests.get(urlReportagem, headers=headers)
-soupReportagem = BeautifulSoup(responseReportagem.content, 'html.parser')
-
-# DATA | HORA -> [1]data DD/MM/AAAA [2]hora 10h03
-dataHoraReportagem = ((soupReportagem.find("time")).text.split(' '))
-
-#autor
-autor = (((soupReportagem.find("p", class_="content-publication-data__from")).text).split(' Por '))[1].rstrip(' ')
-
-textCoder = soupReportagem.find_all("p", class_="content-text__container ")
-
-text = ""
-for i in textCoder:
-    text = text + i.text
-text
-
-imagens = soupReportagem.find_all('img', class_='image content-media__image')
-
-if imagens:
-    print ('não há imagens')
-
-#___________Limpando e formatando as Variaveis___________
+#___________Limpando e formatando as Variaveis (parte antiga. tem que adequar ao novo codigo)___________
 data = dataHoraReportagem[1]
 hora = re.sub(u'h', ':', dataHoraReportagem[2])
 V1 = 'G1 - Minas Gerais'
@@ -113,5 +116,3 @@ V12 = autor
 
 
 print(data, hora, V1, V2, V3, V4, V7, V10, V12)
-
-#dir
