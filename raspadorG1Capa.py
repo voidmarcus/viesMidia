@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import time
 from fake_useragent import UserAgent
-from wordcloud import WordCloud
+#from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import nltk
 import re
@@ -30,6 +30,8 @@ subtitulo = []
 tema = []
 urlReportagem = []
 dataHoraReportagem = []
+data = []
+hora = []
 autor = []
 texto = []
 imagens = []
@@ -73,6 +75,7 @@ for i in urlReportagem:
         print('Erro: Data não encontrada')
         
     textCoder = soupReportagem[cont].find_all("p", class_="content-text__container")
+    #textCoder = soupReportagem[cont].find_all("p", class_="content-text__container theme-color-primary-first-letter")
     text = ''
     
     for i in textCoder:
@@ -89,12 +92,40 @@ for i in urlReportagem:
         
     cont = cont + 1
     
-    
+#___________Transferindo as variáveis data e hora para variáveis separadas
+for i in range(len(dataHoraReportagem)):
+    try:
+        data.append(dataHoraReportagem[i][1])
+    except:
+        data.append ('')
+for i in range(len(dataHoraReportagem)):
+    try:
+        hora.append(re.sub(u'h', ':', dataHoraReportagem[i][2]))
+    except:
+        hora.append ('')
 
+#_________Remove texto em branco e suas variáveis
+for i in range(len(texto)):
+    try:
+        if not texto[i]:
+            print('working')
+            texto.pop(i)
+            autor.pop(i)
+            dataHoraReportagem.pop(i)
+            imagens.pop(i)
+            subtitulo.pop(i)
+            tema.pop(i)
+            titulo.pop(i)
+            urlReportagem.pop(i)
+            data.pop(i)
+            hora.pop(i)
+    except:
+        print(data, hora, titulo, subtitulo)
+        
 
+            
 #___________Limpando e formatando as Variaveis (parte antiga. tem que adequar ao novo codigo)___________
-data = dataHoraReportagem[1]
-hora = re.sub(u'h', ':', dataHoraReportagem[2])
+        
 V1 = 'G1 - Minas Gerais'
 V2 = 3
 V3 = titulo
@@ -113,6 +144,3 @@ else:
 #11 = Tamanho do espaço da notícia
 V12 = autor
 
-
-
-print(data, hora, V1, V2, V3, V4, V7, V10, V12)
