@@ -105,10 +105,11 @@ for i in range(len(dataHoraReportagem)):
         hora.append ('')
 
 #_________Remove texto em branco e suas variáveis
-for i in range(len(texto)):
+i = 0
+for j in range(len(texto)):
     try:
         if not texto[i]:
-            print('working')
+            print(titulo[i])
             texto.pop(i)
             autor.pop(i)
             dataHoraReportagem.pop(i)
@@ -119,8 +120,10 @@ for i in range(len(texto)):
             urlReportagem.pop(i)
             data.pop(i)
             hora.pop(i)
+            i = i - 1
     except:
         print(data, hora, titulo, subtitulo)
+    i = i +1
         
 
             
