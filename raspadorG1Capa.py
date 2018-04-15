@@ -42,7 +42,7 @@ soupReportagem = []
 
 for i in dadosBrutos:
     print('\n \n')
-    titulo.append((i.find_all("p", class_="feed-post-body-title gui-color-primary gui-color-hover")))
+    titulo.append((i.find_all("p", class_="feed-post-body-title gui-color-primary gui-color-hover"))[0].text)
     
     try:
         subtitulo.append(i.find_all("p", class_="feed-post-body-resumo")[0].text)
